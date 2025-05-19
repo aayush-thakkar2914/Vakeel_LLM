@@ -17,7 +17,7 @@ def call_groq_llm(messages):
     body = {
         "model": MODEL,
         "messages": messages,
-        "temperature": 0.5
+        "temperature": 0.7
     }
 
     response = requests.post(BASE_URL, headers=headers, json=body)

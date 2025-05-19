@@ -6,13 +6,8 @@ import os
 
 app = FastAPI(title="Vakeel LLM")
 
-# ✅ Mount static frontend folder
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
-
-# ✅ Include backend routes
 app.include_router(vakeel_router.router, prefix="/api", tags=["Vakeel LLM"])
-
-# ✅ Serve index.html at root
 @app.get("/", include_in_schema=False)
 def root():
     index_path = os.path.join("frontend", "index.html")

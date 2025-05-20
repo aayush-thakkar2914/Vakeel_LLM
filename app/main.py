@@ -1,16 +1,27 @@
 from fastapi import FastAPI
-from app.routers import vakeel_router
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 import os
 
-app = FastAPI(title="Vakeel LLM")
+from app.routers.vakeel_router import router as vakeel_router
 
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
-app.include_router(vakeel_router.router, prefix="/api", tags=["Vakeel LLM"])
-@app.get("/", include_in_schema=False)
-def root():
-    index_path = os.path.join("frontend", "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"error": "Frontend not found"}
+app = FastAPI(title="Vakeel LLM API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
+
+app.mount("/frontend", StaticFiles(directory=frontend_path), name="frontend")
+
+app.include_router(vakeel_router, prefix="/api", tags=["vakeel"])
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse(os.path.join(frontend_path, "index.html"))
